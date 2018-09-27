@@ -26,11 +26,11 @@ public class OverseasOrder implements Order {
 
     @Override
     public void setOrderAmount(double newValue) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.orderAmount = newValue;
     }
 
     @Override
     public void setAdditionalAmount(double newValue) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.additionalSH = newValue;
     }
 }

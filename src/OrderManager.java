@@ -57,7 +57,7 @@ public class OrderManager extends JFrame {
         lblTotalValue
                 = new JLabel("Click Create or GetTotal Button");
         
-        lblNumOrder = new JLabel("Order Number (Only for edit order)");
+        lblNumOrder = new JLabel("Edit Order Only");
 
         //Create the open button
         JButton getTotalButton
@@ -271,11 +271,12 @@ class ButtonHandler implements ActionListener {
     OrderManager objOrderManager;
     int keyNum;
     AllOrders iterator = new AllOrders();
+    Order retrivedOrder = null;
 
     public void actionPerformed(ActionEvent e) {
         //System.out.println();
         String totalResult = null;
-        Order retrivedOrder = null;
+        
         if (e.getActionCommand().equals(OrderManager.EXIT)) {
             System.exit(1);
         }
@@ -310,10 +311,6 @@ class ButtonHandler implements ActionListener {
             Order newOrder = createOrder(orderType, dblOrderAmount, dblTax, dblSH);
             iterator.put(keyNum, newOrder);
 
-            //Get the Visitor
-            //OrderVisitor visitor = objOrderManager.getOrderVisitor();
-            // accept the visitor instance
-            //order.accept(visitor);
             objOrderManager.setTotalValue(" Order " + keyNum + " Created Successfully");
             keyNum++;
         }
@@ -323,11 +320,6 @@ class ButtonHandler implements ActionListener {
             OrderVisitor visitor
                     = objOrderManager.getOrderVisitor();
             visitor.setOrderTotal(0);
-            
-//            while (iterator.hasNext()) {
-//                Order or = (Order) iterator.next();
-//                or.accept(visitor);
-//            }
             System.out.println(iterator.getLiquidacion(visitor));
             totalResult = new Double(
                     visitor.getOrderTotal()).toString();
@@ -352,6 +344,36 @@ class ButtonHandler implements ActionListener {
         }
         if (e.getActionCommand().equals(OrderManager.SAVE_ORDER)){
             
+            String strOrderAmount = objOrderManager.getOrderAmount();
+            String strTax = objOrderManager.getTax();
+            String strSH = objOrderManager.getSH();
+            
+            double dblOrderAmount = 0.0;
+            double dblTax = 0.0;
+            double dblSH = 0.0;
+            
+            if (strOrderAmount.trim().length() == 0) {
+                strOrderAmount = "0.0";
+            }
+            if (strTax.trim().length() == 0) {
+                strTax = "0.0";
+            }
+            if (strSH.trim().length() == 0) {
+                strSH = "0.0";
+            }
+            
+            dblOrderAmount = new Double(strOrderAmount).doubleValue();
+            dblTax = new Double(strTax).doubleValue();
+            dblSH = new Double(strSH).doubleValue();
+            
+            retrivedOrder.setOrderAmount(dblOrderAmount);
+            
+            if(retrivedOrder.getClass().getName().equals("CaliforniaOrder")){
+                retrivedOrder.setAdditionalAmount(dblTax);
+            }
+            if(retrivedOrder.getClass().getName().equals("OverseasOrder")){
+                retrivedOrder.setAdditionalAmount(dblSH);
+            }  
         }
     }
     
