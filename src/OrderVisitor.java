@@ -19,4 +19,10 @@ class OrderVisitor implements VisitorInterface {
   public double getOrderTotal() {
     return orderTotal;//usar iterator
   }
+
+    public void setOrderTotal(double orderTotal) {
+        this.orderTotal = orderTotal;
+    }
+  
+  
 }

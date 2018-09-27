@@ -13,7 +13,7 @@ public class OrderManager extends JFrame {
     public static final String GET_TOTAL = "Get Total";
     public static final String CREATE_ORDER = "Create Order";
     public static final String GET_ORDER = "Get order";
-    public static final String EDIT_ORDER = "Edit Order";
+    public static final String SAVE_ORDER = "Save Order";
     public static final String EXIT = "Exit";
     public static final String CA_ORDER = "California Order";
     public static final String NON_CA_ORDER
@@ -21,10 +21,11 @@ public class OrderManager extends JFrame {
     public static final String OVERSEAS_ORDER = "Overseas Order";
     private JComboBox cmbOrderType;
     private JTextField txtOrderAmount, txtAdditionalTax,
-            txtAdditionalSH;
+            txtAdditionalSH, txtNumOrder;
     private JLabel lblOrderType, lblOrderAmount;
     private JLabel lblAdditionalTax, lblAdditionalSH;
     private JLabel lblTotal, lblTotalValue;
+    private JLabel lblNumOrder;
     
     private OrderVisitor objVisitor;
     
@@ -43,6 +44,8 @@ public class OrderManager extends JFrame {
         txtAdditionalTax = new JTextField(10);
         txtAdditionalSH = new JTextField(10);
         
+        txtNumOrder = new JTextField(10);
+        
         lblOrderType = new JLabel("Order Type:");
         lblOrderAmount = new JLabel("Order Amount:");
         lblAdditionalTax
@@ -53,6 +56,8 @@ public class OrderManager extends JFrame {
         lblTotal = new JLabel("Result:");
         lblTotalValue
                 = new JLabel("Click Create or GetTotal Button");
+        
+        lblNumOrder = new JLabel("Order Number (Only for edit order)");
 
         //Create the open button
         JButton getTotalButton
@@ -66,14 +71,14 @@ public class OrderManager extends JFrame {
         ButtonHandler objButtonHandler = new ButtonHandler(this);
         
         JButton getOrderButton = new JButton(OrderManager.GET_ORDER);
-        JButton editOrderButton = new JButton(OrderManager.EDIT_ORDER);
+        JButton saveOrderButton = new JButton(OrderManager.SAVE_ORDER);
         
         getTotalButton.addActionListener(objButtonHandler);
         createOrderButton.addActionListener(objButtonHandler);
         exitButton.addActionListener(new ButtonHandler());
         
         getOrderButton.addActionListener(objButtonHandler);
-        editOrderButton.addActionListener(objButtonHandler);
+        saveOrderButton.addActionListener(objButtonHandler);
 
         //For layout purposes, put the buttons in a separate panel
         JPanel buttonPanel = new JPanel();
@@ -84,6 +89,8 @@ public class OrderManager extends JFrame {
         GridBagConstraints gbc2 = new GridBagConstraints();
         panel.add(getTotalButton);
         panel.add(createOrderButton);
+        panel.add(getOrderButton);
+        panel.add(saveOrderButton);
         panel.add(exitButton);
         gbc2.anchor = GridBagConstraints.EAST;
         gbc2.gridx = 0;
@@ -93,6 +100,12 @@ public class OrderManager extends JFrame {
         gbc2.gridy = 0;
         gridbag2.setConstraints(getTotalButton, gbc2);
         gbc2.gridx = 2;
+        gbc2.gridy = 0;
+        gridbag2.setConstraints(getOrderButton, gbc2);
+        gbc2.gridx = 3;
+        gbc2.gridy = 0;
+        gridbag2.setConstraints(saveOrderButton, gbc2);
+        gbc2.gridx = 4;
         gbc2.gridy = 0;
         gridbag2.setConstraints(exitButton, gbc2);
 
@@ -109,6 +122,8 @@ public class OrderManager extends JFrame {
         buttonPanel.add(txtAdditionalTax);
         buttonPanel.add(lblAdditionalSH);
         buttonPanel.add(txtAdditionalSH);
+        buttonPanel.add(lblNumOrder);
+        buttonPanel.add(txtNumOrder);
         buttonPanel.add(lblTotal);
         buttonPanel.add(lblTotalValue);
         
@@ -156,10 +171,19 @@ public class OrderManager extends JFrame {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gridbag.setConstraints(lblTotal, gbc);
+        gridbag.setConstraints(lblNumOrder, gbc);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 1;
         gbc.gridy = 4;
+        gridbag.setConstraints(txtNumOrder, gbc);
+        
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gridbag.setConstraints(lblTotal, gbc);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 1;
+        gbc.gridy = 5;
         gridbag.setConstraints(lblTotalValue, gbc);
         
         gbc.insets.left = 2;
@@ -200,7 +224,18 @@ public class OrderManager extends JFrame {
     public void setTotalValue(String msg) {
         lblTotalValue.setText(msg);
     }
-
+    
+    public void setOrderAmount(String msg){
+        txtOrderAmount.setText(msg);
+    }
+    
+    public void setTax(String msg){
+        txtAdditionalTax.setText(msg);
+    }
+    
+    public void setSH(String msg){
+        txtAdditionalSH.setText(msg);
+    }
     public OrderVisitor getOrderVisitor() {
         return objVisitor;
     }
@@ -221,6 +256,14 @@ public class OrderManager extends JFrame {
         return txtAdditionalSH.getText();
     }
     
+    public String getNumOrder(){
+        return txtNumOrder.getText();
+    }
+    
+    public JComboBox getCmbOrderType(){
+        return cmbOrderType;
+    }
+    
 } // End of class OrderManager
 
 class ButtonHandler implements ActionListener {
@@ -232,11 +275,12 @@ class ButtonHandler implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         //System.out.println();
         String totalResult = null;
-        
+        Order retrivedOrder = null;
         if (e.getActionCommand().equals(OrderManager.EXIT)) {
             System.exit(1);
         }
         if (e.getActionCommand().equals(OrderManager.CREATE_ORDER)) {
+            retrivedOrder = null;
 
             //get input values
             String orderType = objOrderManager.getOrderType();
@@ -263,14 +307,14 @@ class ButtonHandler implements ActionListener {
             dblSH = new Double(strSH).doubleValue();
 
             //Create the order
-            Order order = createOrder(orderType, dblOrderAmount, dblTax, dblSH);
-            iterator.put(keyNum, order);
+            Order newOrder = createOrder(orderType, dblOrderAmount, dblTax, dblSH);
+            iterator.put(keyNum, newOrder);
 
             //Get the Visitor
             //OrderVisitor visitor = objOrderManager.getOrderVisitor();
             // accept the visitor instance
             //order.accept(visitor);
-            objOrderManager.setTotalValue(" Order Created Successfully");
+            objOrderManager.setTotalValue(" Order " + keyNum + " Created Successfully");
             keyNum++;
         }
         
@@ -278,19 +322,35 @@ class ButtonHandler implements ActionListener {
             //Get the Visitor
             OrderVisitor visitor
                     = objOrderManager.getOrderVisitor();
-            while (iterator.hasNext()) {
-                Order or = (Order) iterator.next();
-                or.accept(visitor);
-            }
+            visitor.setOrderTotal(0);
+            
+//            while (iterator.hasNext()) {
+//                Order or = (Order) iterator.next();
+//                or.accept(visitor);
+//            }
+            System.out.println(iterator.getLiquidacion(visitor));
             totalResult = new Double(
                     visitor.getOrderTotal()).toString();
             totalResult = " Orders Total = " + totalResult;
             objOrderManager.setTotalValue(totalResult);
         }
         if (e.getActionCommand().equals(OrderManager.GET_ORDER)){
+            String numOrder = objOrderManager.getNumOrder();
+            int intNumOrder = new Integer(numOrder);
             
+            retrivedOrder = (Order) iterator.get(intNumOrder);
+            objOrderManager.setOrderAmount(String.valueOf(retrivedOrder.getOrderAmount()));
+            
+            if(retrivedOrder.getClass().getName().equals("CaliforniaOrder")){
+                objOrderManager.setTax(String.valueOf(retrivedOrder.getAdditionalAmount()));
+            }
+            if(retrivedOrder.getClass().getName().equals("OverseasOrder"))
+                objOrderManager.setSH(String.valueOf(retrivedOrder.getAdditionalAmount()));
+            
+            String orderType = objOrderManager.getOrderType();
+            objOrderManager.getCmbOrderType().setSelectedItem(orderType);
         }
-        if (e.getActionCommand().equals(OrderManager.EDIT_ORDER)){
+        if (e.getActionCommand().equals(OrderManager.SAVE_ORDER)){
             
         }
     }

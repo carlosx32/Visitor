@@ -9,6 +9,7 @@ public class CaliforniaOrder implements Order {
     orderAmount = inp_orderAmount;
     additionalTax = inp_additionalTax;
   }
+  @Override
   public double getOrderAmount() {
     return orderAmount;
   }
@@ -18,5 +19,21 @@ public class CaliforniaOrder implements Order {
   public void accept(OrderVisitor v) {
     v.visit(this);
   }
+
+    @Override
+    public double getAdditionalAmount() {
+        return this.getAdditionalTax();
+    }
+
+    @Override
+    public void setOrderAmount(double newValue) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setAdditionalAmount(double newValue) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
 

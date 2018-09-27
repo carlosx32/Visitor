@@ -48,4 +48,16 @@ public class AllOrders implements Iterator{
         orders.put(key, value);
     }
     
+    public Object get (Object key){
+        return orders.get(key);
+    }
+    
+    public double getLiquidacion(OrderVisitor v){
+        while(this.hasNext()){
+            Order o = (Order) this.next();
+            o.accept(v);
+        }
+        return v.getOrderTotal();
+    }
+    
 }
