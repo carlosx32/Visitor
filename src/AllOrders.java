@@ -19,8 +19,7 @@ public class AllOrders implements Iterator{
     private Map orders;
     private int llave;
     private int max;
-    private Order order;
-
+    //private Order order; //este atributo que? 
     public AllOrders() {
         orders = new HashMap();
         llave = 0;
@@ -38,6 +37,7 @@ public class AllOrders implements Iterator{
 
     @Override
     public Object next() {
+       Order order;
        order = (Order) orders.get(llave);
        llave++;
        return order;
